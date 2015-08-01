@@ -1,0 +1,3 @@
+[submodule "fritz"]
+	path = fritz
+	url = https://github.com/mmitch/fritz.git
