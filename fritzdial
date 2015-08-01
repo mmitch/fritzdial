@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w                                                                                                                                                                                                  
+use strict;
+
+sub expander($@)
+{
+    my ($value, @valid) = (@_);
+    return grep { index($_, $value) == 0} @valid;
+}
+
+my %cmd;
+%cmd = (
+    dial => {
+	description => 'dial a number and start a call',
+	code => sub {
+	    printf "dialing %s...\n", join(' ', @_);
+	},
+    },
+
+    hangup => {
+	description => 'end a call',
+	code => sub {
+	    print "hanging up...\n";
+	},
+    },
+
+    list => {
+	description => 'list something',
+	code => sub {
+	    print "listing something...\n";
+	},
+    },
+
+    quit => {
+	description => 'exit fritzdial',
+	code => sub {
+	    print "exiting\n";
+	    exit;
+	},
+    },
+
+    help => {
+	description => 'show help',
+	code => sub {
+	    print "available commands:\n";
+	    foreach my $cmd (sort keys %cmd)
+	    {
+		printf "  %-10s - %s\n", $cmd, $cmd{$cmd}->{description};
+	    }
+	}
+    },
+    );
+
+while (my $line = <>)
+{
+    chomp $line;
+    my ($command, @args) = (grep { length $_ > 0 } split /\s+/, $line);
+
+    if (defined $command)
+    {
+	print "\n";
+        my @command = expander($command, keys %cmd);
+        if (@command == 1)
+        {
+            $cmd{$command[0]}->{code}(@args);
+        }
+        elsif (@command == 0)
+        {
+            printf "unknown command: %s\n", $command;
+        }
+        else
+        {
+            printf "ambigious command, possible completions are: %s\n", join(' ', @command);
+        }
+	print "\n";
+    }
+}
