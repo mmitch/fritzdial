@@ -1,0 +1,27 @@
+fritzdial - simple commandline dial help for Fritz!Box
+Copyright (C) 2015 by  Christian Garbs <mitch@cgarbs.de>
+Licensed under GNU GPL v2 or later.
+
+project homepage:
+
+  https://github.com/mmitch/fritzdial
+
+installation:
+
+  run 'git submodule init' after 'git clone' to get the Fritz modules
+
+  enable TR-064 remote control and dial help on your Fritz!Box
+
+  create a user with VoIP permissions on your Fritz!Box
+
+  create ~/.fritzdialrc with the following key/value pairs:
+    username = <fritzbox user>
+    password = <fritzbox user's password>
+    
+  if you want to enable SSL, add this line to ~/.fritzdialrc
+    url = https://fritz.box:49443
+  see Fritz documentation for more options (look for upnp_url)
+
+  to set up dial shortcuts, just list any additional keys in ~/.fritzdialrc:
+    mom  = 555 41234
+    work = 555 12345
