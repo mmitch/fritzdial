@@ -8,7 +8,8 @@ project homepage:
 
 installation:
 
-  run 'git submodule init' after 'git clone' to get the Fritz modules
+  run 'git submodule init' and 'git submodule update' after 'git clone'
+  to get the Fritz modules
 
   enable TR-064 remote control and dial help on your Fritz!Box
 
@@ -25,3 +26,6 @@ installation:
   to set up dial shortcuts, just list any additional keys in ~/.fritzdialrc:
     mom  = 555 41234
     work = 555 12345
+
+  don't forget to update the submodule after a 'git update', just run
+  'git submodule update' again
