@@ -1,21 +1,88 @@
 #!/usr/bin/perl -Ifritz
+print <<LICENCE;
+#
+# fritzdial - simple commandline dial help for Fritz!Box
+# Copyright (C) 2015 by  Christian Garbs <mitch@cgarbs.de>
+# Licensed under GNU GPL v2 or later.
+#
+LICENCE
+    ;
 use warnings;
 use strict;
 
 use Fritz;
 
+########################################################
+###
+### global variables
+
+my %cmd;
+my %shortlist;
+my $fritz_service;
+my ($user, $pass, $url);
+
+use constant VOIP_SERVICE  => 'X_VoIP:1';
+use constant DIAL_ACTION   => 'X_AVM-DE_DialNumber';
+use constant DIAL_ARG      => 'NewX_AVM-DE_PhoneNumber';
+use constant HANGUP_ACTION => 'X_AVM-DE_DialHangup';
+
+########################################################
+###
+### subroutines
+
 sub expander($@)
 {
     my ($value, @valid) = (@_);
+    return () unless defined $value;
     return grep { index($_, $value) == 0} @valid;
 }
 
-my %cmd;
+sub check_ok($)
+{
+    my $check = shift;
+    if ($check->error)
+    {
+	printf "ERROR: %s\n", $check->error;
+	return 0;
+    }
+    else
+    {
+	print "OK\n";
+	return 1;
+    }
+}
+
+########################################################
+###
+### commands
+
 %cmd = (
     dial => {
 	description => 'dial a number and start a call',
 	code => sub {
-	    printf "dialing %s...\n", join(' ', @_);
+	    my $number = join('', @_);
+	    if (length $number == 0)
+	    {
+		print "no number given\n";
+		return;
+	    }
+
+	    my @expand = expander($_[0], keys %shortlist);
+	    if (@expand > 1)
+	    {
+		printf "ambigious dial shortcut, possible completions are: %s\n", join(' ', @expand);
+		return;
+	    }
+
+	    my $show = $number;
+	    if (@expand == 1)
+	    {
+		$number = $shortlist{$expand[0]};
+		$show .= " [$number]";
+	    }	
+	    printf "dialing %s...\n", $show;
+	    my $response = $fritz_service->call(DIAL_ACTION, DIAL_ARG() => $number);
+	    check_ok($response);
 	},
     },
 
@@ -23,13 +90,18 @@ my %cmd;
 	description => 'end a call',
 	code => sub {
 	    print "hanging up...\n";
+	    my $response = $fritz_service->call(HANGUP_ACTION);
+	    check_ok($response);
 	},
     },
 
-    list => {
-	description => 'list something',
+    shortlist => {
+	description => 'list all dial shortcuts',
 	code => sub {
-	    print "listing something...\n";
+	    foreach my $shortcut (sort keys %shortlist)
+	    {
+		printf "%-15s  %s\n", $shortcut, $shortlist{$shortcut};
+	    }
 	},
     },
 
@@ -53,6 +125,56 @@ my %cmd;
     },
     );
 
+########################################################
+###
+### main part
+
+print "reading configuration file...";
+
+# read configuration
+my $rcfile = $ENV{HOME}.'/.fritzdialrc';
+open FRITZRC, '<', $rcfile or die "\ncan't open configuration file `$rcfile': $!\n";
+while (my $line = <FRITZRC>)
+{
+    chomp $line;
+    next if $line =~ /^\s*$/;
+    next if $line =~ /^\s*#/;
+
+    if ($line =~ /^(\S+)\s*=\s*(.*?)$/)
+    {
+	if ($1 eq 'username')
+	{
+	    $user = $2;
+	}
+	elsif ($1 eq 'password')
+	{
+	    $pass = $2
+	}
+	elsif ($1 eq 'upnp_url')
+	{
+	    $url = $2
+	}
+	else
+	{
+	    $shortlist{$1} = $2;
+	}
+    }
+}
+close FRITZRC or die $!;
+print "OK\n";
+
+# get Fritz!Box connection
+print "establishing Fritz!Box connection...";
+$fritz_service = Fritz->new(
+    username => $user,
+    password => $pass,
+    defined $url ? (upnp_url => $url) : ()
+    )
+    ->discover->find_service(VOIP_SERVICE);
+die unless check_ok($fritz_service);
+
+# main loop
+print "\n";
 while (my $line = <>)
 {
     chomp $line;
