@@ -10,6 +10,8 @@ LICENCE
 use warnings;
 use strict;
 
+use Term::ReadLine;
+
 use Fritz::Box;
 
 ########################################################
@@ -20,6 +22,7 @@ my %cmd;
 my %shortlist;
 my $fritz_service;
 my ($user, $pass, $url);
+my $OUT = \*STDOUT;
 
 use constant VOIP_SERVICE  => 'X_VoIP:1';
 use constant DIAL_ACTION   => 'X_AVM-DE_DialNumber';
@@ -39,11 +42,11 @@ sub expander($@) {
 sub check_ok($) {
     my $check = shift;
     if ($check->error) {
-	printf "ERROR: %s\n", $check->error;
+	printf $OUT "ERROR: %s\n", $check->error;
 	return 0;
     }
     else {
-	print "OK\n";
+	print $OUT "OK\n";
 	return 1;
     }
 }
@@ -58,13 +61,13 @@ sub check_ok($) {
 	code => sub {
 	    my $number = join('', @_);
 	    if (length $number == 0) {
-		print "no number given\n";
+		print $OUT "no number given\n";
 		return;
 	    }
 
 	    my @expand = expander($_[0], keys %shortlist);
 	    if (@expand > 1) {
-		printf "ambigious dial shortcut, possible completions are: %s\n", join(' ', @expand);
+		printf $OUT "ambigious dial shortcut, possible completions are: %s\n", join(' ', @expand);
 		return;
 	    }
 
@@ -78,11 +81,11 @@ sub check_ok($) {
 	    $number =~ s/\s+//g;
 	    $number =~ tr,-()[]/+#,,d;
 	    if ($number !~ /^\d+$/) {
-		printf "dial error: `%s' is not numeric\n", $number;
+		printf $OUT "dial error: `%s' is not numeric\n", $number;
 		return;
 	    }
 	    
-	    printf "dialing %s...\n", $show;
+	    printf $OUT "dialing %s...\n", $show;
 	    my $response = $fritz_service->call(DIAL_ACTION, DIAL_ARG() => $number);
 	    check_ok($response);
 	},
@@ -91,7 +94,7 @@ sub check_ok($) {
     hangup => {
 	description => 'end a call',
 	code => sub {
-	    print "hanging up...\n";
+	    print $OUT "hanging up...\n";
 	    my $response = $fritz_service->call(HANGUP_ACTION);
 	    check_ok($response);
 	},
@@ -101,7 +104,7 @@ sub check_ok($) {
 	description => 'list all dial shortcuts',
 	code => sub {
 	    foreach my $shortcut (sort keys %shortlist) {
-		printf "%-15s  %s\n", $shortcut, $shortlist{$shortcut};
+		printf $OUT "%-15s  %s\n", $shortcut, $shortlist{$shortcut};
 	    }
 	},
     },
@@ -109,7 +112,7 @@ sub check_ok($) {
     quit => {
 	description => 'exit fritzdial',
 	code => sub {
-	    print "exiting\n";
+	    print $OUT "exiting\n";
 	    exit;
 	},
     },
@@ -117,9 +120,9 @@ sub check_ok($) {
     help => {
 	description => 'show help',
 	code => sub {
-	    print "available commands:\n";
+	    print $OUT "available commands:\n";
 	    foreach my $cmd (sort keys %cmd) {
-		printf "  %-10s - %s\n", $cmd, $cmd{$cmd}->{description};
+		printf $OUT "  %-10s - %s\n", $cmd, $cmd{$cmd}->{description};
 	    }
 	}
     },
@@ -129,9 +132,12 @@ sub check_ok($) {
 ###
 ### main part
 
-print "reading configuration file...";
+# initialize terminal/readline
+my $term = Term::ReadLine->new('fritzdial');
+$OUT = $term->OUT || \*STDOUT;
 
 # read configuration
+print OUT "reading configuration file...";
 my $rcfile = $ENV{HOME}.'/.fritzdialrc';
 open FRITZRC, '<', $rcfile or die "\ncan't open configuration file `$rcfile': $!\n";
 while (my $line = <FRITZRC>) {
@@ -155,10 +161,10 @@ while (my $line = <FRITZRC>) {
     }
 }
 close FRITZRC or die $!;
-print "OK\n";
+print $OUT "OK\n";
 
 # get Fritz!Box connection
-print "establishing Fritz!Box connection...";
+print $OUT "establishing Fritz!Box connection...";
 $fritz_service = Fritz::Box->new(
     username => $user,
     password => $pass,
@@ -168,23 +174,23 @@ $fritz_service = Fritz::Box->new(
 die unless check_ok($fritz_service);
 
 # main loop
-print "\n";
-while (my $line = <>) {
+print $OUT "\n";
+while ( defined ( my $line = $term->readline('>')) ) {
     chomp $line;
     my ($command, @args) = (grep { length $_ > 0 } split /\s+/, $line);
 
     if (defined $command) {
-	print "\n";
+	print $OUT "\n";
         my @command = expander($command, keys %cmd);
         if (@command == 1) {
             $cmd{$command[0]}->{code}(@args);
         }
         elsif (@command == 0) {
-            printf "unknown command: %s\n", $command;
+            printf $OUT "unknown command: %s\n", $command;
         }
 	else {
-            printf "ambigious command, possible completions are: %s\n", join(' ', @command);
+            printf $OUT "ambigious command, possible completions are: %s\n", join(' ', @command);
         }
-	print "\n";
+	print $OUT "\n";
     }
 }
