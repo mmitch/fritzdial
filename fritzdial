@@ -10,7 +10,7 @@ LICENCE
 use warnings;
 use strict;
 
-use Fritz;
+use Fritz::Box;
 
 ########################################################
 ###
@@ -159,7 +159,7 @@ print "OK\n";
 
 # get Fritz!Box connection
 print "establishing Fritz!Box connection...";
-$fritz_service = Fritz->new(
+$fritz_service = Fritz::Box->new(
     username => $user,
     password => $pass,
     defined $url ? (upnp_url => $url) : ()
