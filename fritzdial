@@ -30,23 +30,19 @@ use constant HANGUP_ACTION => 'X_AVM-DE_DialHangup';
 ###
 ### subroutines
 
-sub expander($@)
-{
+sub expander($@) {
     my ($value, @valid) = (@_);
     return () unless defined $value;
     return grep { index($_, $value) == 0} @valid;
 }
 
-sub check_ok($)
-{
+sub check_ok($) {
     my $check = shift;
-    if ($check->error)
-    {
+    if ($check->error) {
 	printf "ERROR: %s\n", $check->error;
 	return 0;
     }
-    else
-    {
+    else {
 	print "OK\n";
 	return 1;
     }
@@ -61,22 +57,19 @@ sub check_ok($)
 	description => 'dial a number and start a call',
 	code => sub {
 	    my $number = join('', @_);
-	    if (length $number == 0)
-	    {
+	    if (length $number == 0) {
 		print "no number given\n";
 		return;
 	    }
 
 	    my @expand = expander($_[0], keys %shortlist);
-	    if (@expand > 1)
-	    {
+	    if (@expand > 1) {
 		printf "ambigious dial shortcut, possible completions are: %s\n", join(' ', @expand);
 		return;
 	    }
 
 	    my $show = $number;
-	    if (@expand == 1)
-	    {
+	    if (@expand == 1) {
 		$number = $shortlist{$expand[0]};
 		$show .= " [$number]";
 	    }
@@ -84,8 +77,7 @@ sub check_ok($)
 	    # remove whitespace and common punctuation in telephone numbers
 	    $number =~ s/\s+//g;
 	    $number =~ tr,-()[]/+#,,d;
-	    if ($number !~ /^\d+$/)
-	    {
+	    if ($number !~ /^\d+$/) {
 		printf "dial error: `%s' is not numeric\n", $number;
 		return;
 	    }
@@ -108,8 +100,7 @@ sub check_ok($)
     shortlist => {
 	description => 'list all dial shortcuts',
 	code => sub {
-	    foreach my $shortcut (sort keys %shortlist)
-	    {
+	    foreach my $shortcut (sort keys %shortlist) {
 		printf "%-15s  %s\n", $shortcut, $shortlist{$shortcut};
 	    }
 	},
@@ -127,8 +118,7 @@ sub check_ok($)
 	description => 'show help',
 	code => sub {
 	    print "available commands:\n";
-	    foreach my $cmd (sort keys %cmd)
-	    {
+	    foreach my $cmd (sort keys %cmd) {
 		printf "  %-10s - %s\n", $cmd, $cmd{$cmd}->{description};
 	    }
 	}
@@ -144,28 +134,22 @@ print "reading configuration file...";
 # read configuration
 my $rcfile = $ENV{HOME}.'/.fritzdialrc';
 open FRITZRC, '<', $rcfile or die "\ncan't open configuration file `$rcfile': $!\n";
-while (my $line = <FRITZRC>)
-{
+while (my $line = <FRITZRC>) {
     chomp $line;
     next if $line =~ /^\s*$/;
     next if $line =~ /^\s*#/;
 
-    if ($line =~ /^(\S+)\s*=\s*(.*?)$/)
-    {
-	if ($1 eq 'username')
-	{
+    if ($line =~ /^(\S+)\s*=\s*(.*?)$/) {
+	if ($1 eq 'username') {
 	    $user = $2;
 	}
-	elsif ($1 eq 'password')
-	{
+	elsif ($1 eq 'password') {
 	    $pass = $2
 	}
-	elsif ($1 eq 'upnp_url')
-	{
+	elsif ($1 eq 'upnp_url') {
 	    $url = $2
 	}
-	else
-	{
+	else {
 	    $shortlist{$1} = $2;
 	}
     }
@@ -185,25 +169,20 @@ die unless check_ok($fritz_service);
 
 # main loop
 print "\n";
-while (my $line = <>)
-{
+while (my $line = <>) {
     chomp $line;
     my ($command, @args) = (grep { length $_ > 0 } split /\s+/, $line);
 
-    if (defined $command)
-    {
+    if (defined $command) {
 	print "\n";
         my @command = expander($command, keys %cmd);
-        if (@command == 1)
-        {
+        if (@command == 1) {
             $cmd{$command[0]}->{code}(@args);
         }
-        elsif (@command == 0)
-        {
+        elsif (@command == 0) {
             printf "unknown command: %s\n", $command;
         }
-        else
-        {
+	else {
             printf "ambigious command, possible completions are: %s\n", join(' ', @command);
         }
 	print "\n";
