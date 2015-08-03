@@ -79,7 +79,17 @@ sub check_ok($)
 	    {
 		$number = $shortlist{$expand[0]};
 		$show .= " [$number]";
-	    }	
+	    }
+
+	    # remove whitespace and common punctuation in telephone numbers
+	    $number =~ s/\s+//g;
+	    $number =~ tr,-()[]/+#,,d;
+	    if ($number !~ /^\d+$/)
+	    {
+		printf "dial error: `%s' is not numeric\n", $number;
+		return;
+	    }
+	    
 	    printf "dialing %s...\n", $show;
 	    my $response = $fritz_service->call(DIAL_ACTION, DIAL_ARG() => $number);
 	    check_ok($response);
