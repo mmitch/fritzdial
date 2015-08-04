@@ -68,6 +68,33 @@ sub check_ok($) {
     }
 }
 
+sub completion_function($$$) {
+    my ($text, $line, $start_pos, $end_pos) = @_;
+    my $prefix = substr $line, 0, $start_pos;
+    my (@words) = (grep { length $_ > 0 } split /\s+/, $prefix);
+
+    if (@words == 0) {
+	# first word: expand commands
+	return expander($text, sort keys %cmd);
+    }
+    elsif (@words == 1) {
+	# second word: check if command supports expansion
+	my $cmd = $words[0];
+	if (exists $cmd{$cmd}
+	    and exists $cmd{$cmd}->{expansion}) {
+
+	    return expander($text, $cmd{$cmd}->{expansion}());
+	}
+	else {
+	    return ();
+	}
+    }
+    else {
+	# third word or later: no expansion;
+	return ();
+    }
+}
+
 ########################################################
 ###
 ### commands
@@ -105,6 +132,9 @@ sub check_ok($) {
 	    printf $OUT "dialing %s...\n", $show;
 	    my $response = $voip_service->call(DIAL_ACTION, DIAL_ARG() => $number);
 	    check_ok($response);
+	},
+	expansion => sub {
+	    return sort keys %shortlist;
 	},
     },
 
@@ -182,6 +212,7 @@ sub check_ok($) {
 
 # initialize terminal/readline
 my $term = Term::ReadLine->new('fritzdial');
+$term->Attribs->{'completion_function'} = \&completion_function;
 $OUT = $term->OUT || \*STDOUT;
 
 # read configuration
