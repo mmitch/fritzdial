@@ -137,7 +137,7 @@ my $term = Term::ReadLine->new('fritzdial');
 $OUT = $term->OUT || \*STDOUT;
 
 # read configuration
-print OUT "reading configuration file...";
+print $OUT "reading configuration file...";
 my $rcfile = $ENV{HOME}.'/.fritzdialrc';
 open FRITZRC, '<', $rcfile or die "\ncan't open configuration file `$rcfile': $!\n";
 while (my $line = <FRITZRC>) {
