@@ -10,7 +10,9 @@ LICENCE
 use warnings;
 use strict;
 
+use LWP::UserAgent;
 use Term::ReadLine;
+use XML::Simple;
 
 use Fritz::Box;
 
@@ -20,14 +22,29 @@ use Fritz::Box;
 
 my %cmd;
 my %shortlist;
-my $fritz_service;
+my ($voip_service, $call_service);
 my ($user, $pass, $url);
+
 my $OUT = \*STDOUT;
+my $ua = LWP::UserAgent->new();
+my $xs = XML::Simple->new(ForceArray => 1, KeyAttr => []);
 
 use constant VOIP_SERVICE  => 'X_VoIP:1';
 use constant DIAL_ACTION   => 'X_AVM-DE_DialNumber';
 use constant DIAL_ARG      => 'NewX_AVM-DE_PhoneNumber';
 use constant HANGUP_ACTION => 'X_AVM-DE_DialHangup';
+
+use constant CALL_SERVICE  => 'X_AVM-DE_OnTel:';
+use constant LIST_ACTION   => 'GetCallList';
+use constant LIST_ARG      => 'NewCallListURL';
+
+use constant CALL_TYPE => {
+    # TODO: unknown types stay numeric for now, figure them out as they show up
+    # TODO: check 1 = internal?
+    2 => 'in',
+    3 => 'out',
+    _M => 'miss',
+};
 
 ########################################################
 ###
@@ -86,7 +103,7 @@ sub check_ok($) {
 	    }
 	    
 	    printf $OUT "dialing %s...\n", $show;
-	    my $response = $fritz_service->call(DIAL_ACTION, DIAL_ARG() => $number);
+	    my $response = $voip_service->call(DIAL_ACTION, DIAL_ARG() => $number);
 	    check_ok($response);
 	},
     },
@@ -95,7 +112,7 @@ sub check_ok($) {
 	description => 'end a call',
 	code => sub {
 	    print $OUT "hanging up...\n";
-	    my $response = $fritz_service->call(HANGUP_ACTION);
+	    my $response = $voip_service->call(HANGUP_ACTION);
 	    check_ok($response);
 	},
     },
@@ -105,6 +122,37 @@ sub check_ok($) {
 	code => sub {
 	    foreach my $shortcut (sort keys %shortlist) {
 		printf $OUT "%-15s  %s\n", $shortcut, $shortlist{$shortcut};
+	    }
+	},
+    },
+
+    calllist => {
+	description => 'list past calls',
+	code => sub {
+	    print $OUT "getting call list...\n";
+	    my $response = $call_service->call(LIST_ACTION);
+	    if (check_ok($response)) {
+		my $xml = $ua->get($response->data->{LIST_ARG()});
+		my $xmltree = $xs->parse_string($xml->decoded_content);
+		foreach my $call (@{$xmltree->{Call}}) {
+		    my $type = $call->{Type}->[0];
+		    my $dur  = $call->{Duration}->[0];
+		    if ($type == 2 and $dur eq '0:00') {
+			# special handling for missed calls
+			$type = CALL_TYPE->{_M};
+		    }
+		    else {
+			$type = CALL_TYPE->{$type} if (exists CALL_TYPE->{$type});
+		    }
+
+		    printf $OUT ("  %-14s  %4s  %-20s -> %-20s %7s\n",
+				 $call->{Date}->[0],
+				 $type,
+				 $call->{Caller}->[0],
+				 $call->{Called}->[0],
+				 $dur,
+			);
+		}
 	    }
 	},
     },
@@ -165,13 +213,17 @@ print $OUT "OK\n";
 
 # get Fritz!Box connection
 print $OUT "establishing Fritz!Box connection...";
-$fritz_service = Fritz::Box->new(
+my $fritz = Fritz::Box->new(
     username => $user,
     password => $pass,
     defined $url ? (upnp_url => $url) : ()
     )
-    ->discover->find_service(VOIP_SERVICE);
-die unless check_ok($fritz_service);
+    ->discover;
+die unless check_ok($fritz);
+$call_service = $fritz->find_service(CALL_SERVICE);
+$voip_service = $fritz->find_service(VOIP_SERVICE);
+$call_service->errorcheck;
+$voip_service->errorcheck;
 
 # main loop
 print $OUT "\n";
