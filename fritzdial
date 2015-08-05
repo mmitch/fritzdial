@@ -39,11 +39,9 @@ use constant LIST_ACTION   => 'GetCallList';
 use constant LIST_ARG      => 'NewCallListURL';
 
 use constant CALL_TYPE => {
-    # TODO: unknown types stay numeric for now, figure them out as they show up
-    # TODO: check 1 = internal?
-    2 => 'in',
+    1 => 'in',
+    2 => 'miss',
     3 => 'out',
-    _M => 'miss',
 };
 
 ########################################################
@@ -168,13 +166,7 @@ sub completion_function($$$) {
 		foreach my $call (@{$xmltree->{Call}}) {
 		    my $type = $call->{Type}->[0];
 		    my $dur  = $call->{Duration}->[0];
-		    if ($type == 2 and $dur eq '0:00') {
-			# special handling for missed calls
-			$type = CALL_TYPE->{_M};
-		    }
-		    else {
-			$type = CALL_TYPE->{$type} if (exists CALL_TYPE->{$type});
-		    }
+		    $type = CALL_TYPE->{$type} if (exists CALL_TYPE->{$type});
 
 		    printf $OUT ("  %-14s  %4s  %-20s -> %-20s %7s\n",
 				 $call->{Date}->[0],
