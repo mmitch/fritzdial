@@ -166,6 +166,7 @@ sub completion_function($$$) {
 		foreach my $call (@{$xmltree->{Call}}) {
 		    my $type = $call->{Type}->[0];
 		    my $dur  = $call->{Duration}->[0];
+		    $dur = '' if $type == 2; # no duration on missed calls:
 		    $type = CALL_TYPE->{$type} if (exists CALL_TYPE->{$type});
 
 		    printf $OUT ("  %-14s  %4s  %-20s -> %-20s %7s\n",
