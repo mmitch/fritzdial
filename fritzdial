@@ -21,7 +21,7 @@ use Fritz::Box;
 ### global variables
 
 my %cmd;
-my %shortlist;
+my (%shortlist, %revlist);
 my ($voip_service, $call_service);
 my ($user, $pass, $url);
 
@@ -52,6 +52,15 @@ sub expander($@) {
     my ($value, @valid) = (@_);
     return () unless defined $value;
     return grep { index($_, $value) == 0} @valid;
+}
+
+# remove whitespace and common punctuation from phone numbers
+# keep # and * for internal calls etc.
+sub strip_number($) {
+    my $number = shift;
+    $number =~ s/\s+//g;
+    $number =~ tr,-()[]/+,,d;
+    return $number;
 }
 
 sub check_ok($) {
@@ -119,10 +128,7 @@ sub completion_function($$$) {
 		$show .= " [$number]";
 	    }
 
-	    # remove whitespace and common punctuation in phone numbers
-	    # keep # and * for internal calls etc.
-	    $number =~ s/\s+//g;
-	    $number =~ tr,-()[]/+,,d;
+	    $number = strip_number($number);
 	    if ($number !~ /^[0-9*#]+$/) {
 		printf $OUT "dial error: `%s' does not look like a phone number\n", $number;
 		return;
@@ -166,14 +172,22 @@ sub completion_function($$$) {
 		foreach my $call (@{$xmltree->{Call}}) {
 		    my $type = $call->{Type}->[0];
 		    my $dur  = $call->{Duration}->[0];
-		    $dur = '' if $type == 2; # no duration on missed calls:
+		    my $caller = $call->{Caller}->[0];
+		    my $called = $call->{Called}->[0];
+
+		    # no duration on missed calls:
+		    $dur = '' if $type == 2;
+
+		    # expand other arguments
 		    $type = CALL_TYPE->{$type} if (exists CALL_TYPE->{$type});
+		    $caller = $revlist{$caller} if exists $revlist{$caller};
+		    $called = $revlist{$called} if exists $revlist{$called};
 
 		    printf $OUT ("  %-14s  %4s  %-20s -> %-20s %7s\n",
 				 $call->{Date}->[0],
 				 $type,
-				 $call->{Caller}->[0],
-				 $call->{Called}->[0],
+				 $caller,
+				 $called,
 				 $dur,
 			);
 		}
@@ -230,6 +244,7 @@ while (my $line = <FRITZRC>) {
 	}
 	else {
 	    $shortlist{$1} = $2;
+	    $revlist{strip_number($2)} = $1;
 	}
     }
 }
