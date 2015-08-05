@@ -121,11 +121,12 @@ sub completion_function($$$) {
 		$show .= " [$number]";
 	    }
 
-	    # remove whitespace and common punctuation in telephone numbers
+	    # remove whitespace and common punctuation in phone numbers
+	    # keep # and * for internal calls etc.
 	    $number =~ s/\s+//g;
-	    $number =~ tr,-()[]/+#,,d;
-	    if ($number !~ /^\d+$/) {
-		printf $OUT "dial error: `%s' is not numeric\n", $number;
+	    $number =~ tr,-()[]/+,,d;
+	    if ($number !~ /^[0-9*#]+$/) {
+		printf $OUT "dial error: `%s' does not look like a phone number\n", $number;
 		return;
 	    }
 	    
