@@ -27,5 +27,8 @@ installation:
     mom  = 555 41234
     work = 555 12345
 
+  if multiple shortcuts map to the same number, the last one is used for
+  reverse lookups (showing names instead of numbers in the calllist)
+
   don't forget to update the submodule after a 'git update', just run
   'git submodule update' again
