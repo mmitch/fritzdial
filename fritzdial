@@ -1,5 +1,5 @@
 #!/usr/bin/perl -Ifritz
-print <<LICENCE;
+my $LICENCE = <<LICENCE;
 #
 # fritzdial - simple commandline dial help for Fritz!Box
 # Copyright (C) 2015 by  Christian Garbs <mitch@cgarbs.de>
@@ -219,9 +219,13 @@ sub completion_function($$$) {
 ### main part
 
 # initialize terminal/readline
-my $term = Term::ReadLine->new('fritzdial');
-$term->Attribs->{'completion_function'} = \&completion_function;
-$OUT = $term->OUT || \*STDOUT;
+my $term = undef;
+unless (defined $ARGV[0] and $ARGV[0] eq '-') {
+    $term = Term::ReadLine->new('fritzdial');
+    $term->Attribs->{'completion_function'} = \&completion_function;
+    $OUT = $term->OUT || \*STDOUT;
+    print $OUT $LICENCE;
+}
 
 # read configuration
 print $OUT "reading configuration file...";
@@ -267,7 +271,10 @@ $voip_service->errorcheck;
 
 # main loop
 print $OUT "\n";
-while ( defined ( my $line = $term->readline('>')) ) {
+my $line;
+while ( defined $term
+	? (defined ( $line = $term->readline('>')))
+	: ($line = <>) ) {
     chomp $line;
     my ($command, @args) = (grep { length $_ > 0 } split /\s+/, $line);
 

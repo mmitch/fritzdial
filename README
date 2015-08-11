@@ -32,3 +32,9 @@ installation:
 
   don't forget to update the submodule after a 'git update', just run
   'git submodule update' again
+
+usage:
+
+  run ``fritzdial.pl'' to use it interactively
+
+  run ``fritzdial.pl -'' to read commands from stdin (no Term::ReadLine used)
