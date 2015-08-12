@@ -89,7 +89,7 @@ sub completion_function($$$) {
     }
     elsif (@words == 1) {
 	# second word: check if command supports expansion
-	my $cmd = $words[0];
+	my $cmd = join('!!', expander($words[0], keys %cmd));
 	if (exists $cmd{$cmd}
 	    and exists $cmd{$cmd}->{expansion}) {
 
