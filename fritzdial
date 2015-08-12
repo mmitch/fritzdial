@@ -42,6 +42,7 @@ use constant CALL_TYPE => {
     1 => 'in',
     2 => 'miss',
     3 => 'out',
+    10 => 'block',
 };
 
 ########################################################
@@ -183,7 +184,7 @@ sub completion_function($$$) {
 		    $caller = $revlist{$caller} if exists $revlist{$caller};
 		    $called = $revlist{$called} if exists $revlist{$called};
 
-		    printf $OUT ("  %-14s  %4s  %-20s -> %-20s %7s\n",
+		    printf $OUT ("  %-14s  %5s  %-20s -> %-20s %7s\n",
 				 $call->{Date}->[0],
 				 $type,
 				 $caller,
