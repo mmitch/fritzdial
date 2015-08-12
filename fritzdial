@@ -239,7 +239,7 @@ while (my $line = <FRITZRC>) {
     next if $line =~ /^\s*$/;
     next if $line =~ /^\s*#/;
 
-    if ($line =~ /^(\S+)\s*=\s*(.*?)$/) {
+    if ($line =~ /^\s*(.+?)\s*=\s*(.*?)$/) {
 	if ($1 eq 'username') {
 	    $user = $2;
 	}
