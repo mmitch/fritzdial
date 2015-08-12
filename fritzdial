@@ -47,6 +47,8 @@ use constant CALL_TYPE => {
     11 => '*OUT*',
 };
 
+use constant CALLLIST_LINES => 16;
+
 ########################################################
 ###
 ### subroutines
@@ -111,7 +113,7 @@ sub completion_function($$$) {
 
 %cmd = (
     dial => {
-	description => 'dial a number and start a call',
+	description => 'dial a <number> or <shortlist entry>',
 	code => sub {
 	    my $number = join('', @_);
 	    if (length $number == 0) {
@@ -165,13 +167,15 @@ sub completion_function($$$) {
     },
 
     calllist => {
-	description => 'list past calls',
+	description => 'list received/outgoing/missed calls (optional: <number of lines>)',
 	code => sub {
+	    my $max_lines = shift @_ || CALLLIST_LINES;
 	    print $OUT "getting call list...\n";
 	    my $response = $call_service->call(LIST_ACTION);
 	    if (check_ok($response)) {
 		my $xml = $ua->get($response->data->{LIST_ARG()});
 		my $xmltree = $xs->parse_string($xml->decoded_content);
+		my $line = 1;
 		foreach my $call (@{$xmltree->{Call}}) {
 		    my $type = $call->{Type}->[0];
 		    my $dur  = $call->{Duration}->[0];
@@ -193,6 +197,9 @@ sub completion_function($$$) {
 				 $called,
 				 $dur,
 			);
+
+		    $line++;
+		    last if $line > $max_lines;
 		}
 	    }
 	},
