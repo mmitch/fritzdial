@@ -183,8 +183,8 @@ sub completion_function($$$) {
 
 		    # expand other arguments
 		    $type = CALL_TYPE->{$type} if (exists CALL_TYPE->{$type});
-		    $caller = $revlist{$caller} if exists $revlist{$caller};
-		    $called = $revlist{$called} if exists $revlist{$called};
+		    $caller = $revlist{strip_number($caller)} if exists $revlist{strip_number($caller)};
+		    $called = $revlist{strip_number($called)} if exists $revlist{strip_number($called)};
 
 		    printf $OUT ("  %-14s  %5s  %-20s -> %-20s %7s\n",
 				 $call->{Date}->[0],
