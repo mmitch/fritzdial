@@ -182,6 +182,14 @@ sub completion_function($$$) {
 		    my $caller = $call->{Caller}->[0];
 		    my $called = $call->{Called}->[0];
 
+		    # fix unknown caller
+		    if (ref($caller) eq 'HASH') {
+			$caller = $call->{Name}->[0];
+			if (ref($caller) eq 'HASH' or $caller eq '') {
+			    $caller = 'unknown';
+			}
+		    }
+
 		    # no duration on missed calls:
 		    $dur = '' if $type == 2;
 
