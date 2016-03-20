@@ -1,4 +1,4 @@
-#!/usr/bin/perl -Ifritz
+#!/usr/bin/perl -Ifritz/lib
 my $LICENCE = <<LICENCE;
 #
 # fritzdial - simple commandline dial help for Fritz!Box
