@@ -121,7 +121,7 @@ sub completion_function($$$) {
 		return;
 	    }
 
-	    my @expand = expander($_[0], keys %shortlist);
+	    my @expand = expander(join(' ', @_), keys %shortlist);
 	    if (@expand > 1) {
 		printf $OUT "ambigious dial shortcut, possible completions are: %s\n", join(' ', @expand);
 		return;
@@ -130,7 +130,7 @@ sub completion_function($$$) {
 	    my $show = $number;
 	    if (@expand == 1) {
 		$number = $shortlist{$expand[0]};
-		$show .= " [$number]";
+		$show = sprintf '%s [%s]', $expand[0], $number;
 	    }
 
 	    $number = strip_number($number);
