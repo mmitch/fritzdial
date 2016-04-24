@@ -55,16 +55,16 @@ installation
 usage
 -----
 
-* run ``fritzdial.pl'' to use it interactively
+* run ``fritzdial.pl`` to use it interactively
 
-* run ``fritzdial.pl -'' to read commands from stdin (no Term::ReadLine used)
+* run ``fritzdial.pl -`` to read commands from stdin (no Term::ReadLine used)
 
 
 test suite
 ----------
 
-The ``features'' directory contains Cucumber test files (features,
+The ``features`` directory contains Cucumber test files (features,
 step definition and some stubbing magic).
 
-To run the tests, install ``Test::BDD::Cucumber'' and ``Expect'' and
-run the ``pherkin'' command.
+To run the tests, install ``Test::BDD::Cucumber`` and ``Expect`` and
+run the ``pherkin`` command.
