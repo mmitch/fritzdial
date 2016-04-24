@@ -6,12 +6,12 @@ Feature: quit fritzdial
   Background:
     Given a running fritzdial
 
-  Scenario:
+  Scenario: enter quit
     When I enter "quit"
     Then fritzdial should quit
 
-    @in_process
-  Scenario:
+  @in_progress
+  Scenario: close stdin
     When I close stdin
     Then fritzdial should quit
 
