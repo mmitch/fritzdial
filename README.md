@@ -21,7 +21,7 @@ project homepage
 installation
 ------------
 
-1. run 'git submodule init' and 'git submodule update' after 'git clone'
+1. run ``git submodule init`` and ``git submodule update`` after ``git clone``
    to get the Fritz modules
 
 2. enable TR-064 remote control and dial help on your Fritz!Box
@@ -44,7 +44,7 @@ installation
     ```
     mom  = 555 41234
     work = 555 12345
-	```
+    ```
    if multiple shortcuts map to the same number, the last one is used for
    reverse lookups (showing names instead of numbers in the calllist)
 
@@ -57,7 +57,7 @@ usage
 
 * run ``fritzdial.pl`` to use it interactively
 
-* run ``fritzdial.pl -`` to read commands from stdin (no Term::ReadLine used)
+* run ``fritzdial.pl -`` to read commands from stdin (no ``Term::ReadLine`` used)
 
 
 test suite
