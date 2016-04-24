@@ -46,3 +46,11 @@ Licensed under GNU GPL v2 or later.
 * run ``fritzdial.pl'' to use it interactively
 
 * run ``fritzdial.pl -'' to read commands from stdin (no Term::ReadLine used)
+
+## test suite
+
+The ``features'' directory contains Cucumber test files (features,
+step definition and some stubbing magic).
+
+To run the tests, install ``Test::BDD::Cucumber'' and run the
+``pherkin'' command.
