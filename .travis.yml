@@ -10,6 +10,7 @@ perl:
 install:
   - cpanm --quiet --notest --skip-satisfied XML::Simple
   - cpanm --quiet --notest --skip-satisfied Test::BDD::Cucumber Expect XML::Simple
+  - rm -rf fritz
 
 script:
   - pherkin -t ~@in_progress 
