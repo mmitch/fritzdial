@@ -52,5 +52,5 @@ Licensed under GNU GPL v2 or later.
 The ``features'' directory contains Cucumber test files (features,
 step definition and some stubbing magic).
 
-To run the tests, install ``Test::BDD::Cucumber'' and run the
-``pherkin'' command.
+To run the tests, install ``Test::BDD::Cucumber'' and ``Expect'' and
+run the ``pherkin'' command.

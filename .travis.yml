@@ -8,8 +8,9 @@ perl:
   - "5.14"
 
 install:
-  - cpanm --quiet --notest --skip-satisfied Test::BDD::Cucumber
+  - cpanm --quiet --notest --skip-satisfied Test::BDD::Cucumber Expect
 
 script:
   - pherkin -t ~@in_progress 
   - pherkin -t @in_progress || true
+  
