@@ -6,6 +6,7 @@ use warnings;
 use Test::More;
 use Test::BDD::Cucumber::StepFile;
 
+use Cwd;
 use Expect;
 
 Given qr/a running fritzdial/, sub {
@@ -14,6 +15,8 @@ Given qr/a running fritzdial/, sub {
 
     $expect->log_stdout(0);
     # add search path to use Fritz::Box stub
+    # set $HOME do redirect to our configuration file
+    $ENV{HOME} = getcwd().'/features/testarea';
     $expect->spawn('perl -I./features/stubbing ./fritzdial', ())
 	|| fail("cannot spawn command: $!");
 
