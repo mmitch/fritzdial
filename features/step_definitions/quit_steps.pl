@@ -13,7 +13,8 @@ Given qr/a running fritzdial/, sub {
     isa_ok($expect, 'Expect', 'Expect->new');
 
     $expect->log_stdout(0);
-    $expect->spawn('./fritzdial', ())
+    # add search path to use Fritz::Box stub
+    $expect->spawn('perl -I./features/stubbing ./fritzdial', ())
 	|| fail("cannot spawn command: $!");
 
     $expect->expect(5, '-re', 'configuration file\.\.\.OK')
