@@ -1,5 +1,8 @@
 # fritzdial - simple commandline dial help for AVM Fritz!Box
 
+[![Build Status](https://travis-ci.org/mmitch/fritzdial.svg?branch=master)](https://travis-ci.org/mmitch/fritzdial)
+[![GPL 2+](https://img.shields.io/badge/license-GPL%202%2B-blue.svg)](http://www.gnu.org/licenses/gpl-2.0-standalone.html)
+
 ## license/copyright
 
 Copyright (C) 2015 by  Christian Garbs <mitch@cgarbs.de>  
