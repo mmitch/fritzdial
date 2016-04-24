@@ -9,6 +9,7 @@ perl:
 
 install:
   - cpanm --quiet --notest --skip-satisfied Test::BDD::Cucumber Expect
+  - rm -r fritz
 
 script:
   - pherkin -t ~@in_progress 

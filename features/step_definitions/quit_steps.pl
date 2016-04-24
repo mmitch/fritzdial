@@ -13,7 +13,7 @@ Given qr/a running fritzdial/, sub {
     my $expect = Expect->new();
     isa_ok($expect, 'Expect', 'Expect->new');
 
-#    $expect->log_stdout(0);
+    $expect->log_stdout(0);
     # add search path to use Fritz::Box stub
     # set $HOME do redirect to our configuration file
     $ENV{HOME} = getcwd().'/features/testarea';
