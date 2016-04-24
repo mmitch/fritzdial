@@ -1,0 +1,15 @@
+language: perl
+
+perl:
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+
+install:
+  - cpanm --quiet --notest --skip-satisfied Test::BDD::Cucumber
+
+script:
+  - pherkin -t ~@in_progress 
+  - pherkin -t @in_progress || true
