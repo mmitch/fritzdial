@@ -1,18 +1,25 @@
-# fritzdial - simple commandline dial help for AVM Fritz!Box
+fritzdial - simple commandline dial help for AVM Fritz!Box
+==========================================================
 
 [![Build Status](https://travis-ci.org/mmitch/fritzdial.svg?branch=master)](https://travis-ci.org/mmitch/fritzdial)
 [![GPL 2+](https://img.shields.io/badge/license-GPL%202%2B-blue.svg)](http://www.gnu.org/licenses/gpl-2.0-standalone.html)
 
-## license/copyright
+
+license/copyright
+-----------------
 
 Copyright (C) 2015 by  Christian Garbs <mitch@cgarbs.de>  
 Licensed under GNU GPL v2 or later.
 
-## project homepage
+
+project homepage
+----------------
 
   https://github.com/mmitch/fritzdial
 
-## installation
+
+installation
+------------
 
 1. run 'git submodule init' and 'git submodule update' after 'git clone'
    to get the Fritz modules
@@ -44,13 +51,17 @@ Licensed under GNU GPL v2 or later.
 7. don't forget to update the submodule after a ``git update``, just run
    ``git submodule update`` again
 
-## usage
+
+usage
+-----
 
 * run ``fritzdial.pl'' to use it interactively
 
 * run ``fritzdial.pl -'' to read commands from stdin (no Term::ReadLine used)
 
-## test suite
+
+test suite
+----------
 
 The ``features'' directory contains Cucumber test files (features,
 step definition and some stubbing magic).
