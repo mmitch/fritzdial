@@ -26,7 +26,11 @@ my ($voip_service, $call_service);
 my ($user, $pass, $url);
 
 my $OUT = \*STDOUT;
+
 my $ua = LWP::UserAgent->new();
+# disable SSL certificate checks, Fritz!Box has no verifiable SSL certificate
+$ua->ssl_opts(verify_hostname => 0 ,SSL_verify_mode => 0x00);
+
 my $xs = XML::Simple->new(ForceArray => 1, KeyAttr => []);
 
 use constant VOIP_SERVICE  => 'X_VoIP:1';
