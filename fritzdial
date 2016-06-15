@@ -1,4 +1,4 @@
-#!/usr/bin/perl -Ifritz/lib
+#!/usr/bin/perl
 my $LICENCE = <<LICENCE;
 #
 # fritzdial - simple commandline dial help for Fritz!Box
@@ -14,7 +14,7 @@ use LWP::UserAgent;
 use Term::ReadLine;
 use XML::Simple;
 
-use Fritz::Box;
+use Net::Fritz::Box;
 
 ########################################################
 ###
@@ -279,7 +279,7 @@ print $OUT "OK\n";
 
 # get Fritz!Box connection
 print $OUT "establishing Fritz!Box connection...";
-my $fritz = Fritz::Box->new(
+my $fritz = Net::Fritz::Box->new(
     username => $user,
     password => $pass,
     defined $url ? (upnp_url => $url) : ()

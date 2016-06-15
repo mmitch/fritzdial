@@ -21,8 +21,8 @@ project homepage
 installation
 ------------
 
-1. run ``git submodule init`` and ``git submodule update`` after ``git clone``
-   to get the Fritz modules
+1. install the ``Net::Fritz`` module from CPAN, eg. with ``cpan -i
+   Net::Fritz``
 
 2. enable TR-064 remote control and dial help on your Fritz!Box
 
@@ -47,9 +47,6 @@ installation
     ```
    if multiple shortcuts map to the same number, the last one is used for
    reverse lookups (showing names instead of numbers in the calllist)
-
-7. don't forget to update the submodule after a ``git update``, just run
-   ``git submodule update`` again
 
 
 usage
