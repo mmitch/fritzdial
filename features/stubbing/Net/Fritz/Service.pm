@@ -1,4 +1,4 @@
-package Fritz::Service;
+package Net::Fritz::Service;
 
 use Class::Tiny qw ( name );
 

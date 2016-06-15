@@ -1,13 +1,13 @@
-package Fritz::Box;
+package Net::Fritz::Box;
 
 use Class::Tiny qw ( username password upnp_url );
 
-use Fritz::Device;
+use Net::Fritz::Device;
 
 sub discover() {
     my $self = shift;
 
-    return Fritz::Device->new();
+    return Net::Fritz::Device->new();
 }
 
 1;
