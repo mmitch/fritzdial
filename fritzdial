@@ -1,11 +1,11 @@
 #!/usr/bin/perl
-my $LICENCE = <<LICENCE;
+my $LICENSE = <<LICENSE;
 #
 # fritzdial - simple commandline dial help for Fritz!Box
 # Copyright (C) 2015 by  Christian Garbs <mitch@cgarbs.de>
 # Licensed under GNU GPL v2 or later.
 #
-LICENCE
+LICENSE
     ;
 use warnings;
 use strict;
@@ -246,7 +246,7 @@ unless (defined $ARGV[0] and $ARGV[0] eq '-') {
     $term = Term::ReadLine->new('fritzdial');
     $term->Attribs->{'completion_function'} = \&completion_function;
     $OUT = $term->OUT || \*STDOUT;
-    print $OUT $LICENCE;
+    print $OUT $LICENSE;
 }
 
 # read configuration
