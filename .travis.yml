@@ -8,7 +8,7 @@ perl:
   - "5.14"
 
 install:
-  - cpanm --quiet --notest --skip-satisfied XML::Simple
+  - cpanm --quiet --notest --skip-satisfied XML::Simple Net::Fritz
   - cpanm --quiet --notest --skip-satisfied Test::BDD::Cucumber Expect XML::Simple Class::Tiny
   - rm -rf fritz
 
