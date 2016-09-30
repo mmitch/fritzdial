@@ -24,7 +24,8 @@ installation
 1. install the ``Net::Fritz`` module from CPAN, eg. with ``cpan -i
    Net::Fritz``
 
-2. enable TR-064 remote control and dial help on your Fritz!Box
+2. enable TR-064 remote control and dial help on your Fritz!Box (this
+   includes choosing an internal device that fritzdial should dial for)
 
 3. create a user with VoIP permissions on your Fritz!Box
 
