@@ -14,7 +14,7 @@ use LWP::UserAgent;
 use Term::ReadLine;
 use XML::Simple;
 
-use Net::Fritz::Box;
+use Net::Fritz::Box 0.0.9;
 
 ########################################################
 ###
@@ -22,8 +22,8 @@ use Net::Fritz::Box;
 
 my %cmd;
 my (%shortlist, %revlist);
-my ($voip_service, $call_service);
 my ($user, $pass, $url);
+my $fritz;
 
 my $OUT = \*STDOUT;
 
@@ -144,7 +144,7 @@ sub completion_function($$$) {
 	    }
 	    
 	    printf $OUT "dialing %s...\n", $show;
-	    my $response = $voip_service->call(DIAL_ACTION, DIAL_ARG() => $number);
+	    my $response = $fritz->call(VOIP_SERVICE, DIAL_ACTION, DIAL_ARG() => $number);
 	    check_ok($response);
 	},
 	expansion => sub {
@@ -156,7 +156,7 @@ sub completion_function($$$) {
 	description => 'end a call',
 	code => sub {
 	    print $OUT "hanging up...\n";
-	    my $response = $voip_service->call(HANGUP_ACTION);
+	    my $response = $fritz->call(VOIP_SERVICE, HANGUP_ACTION);
 	    check_ok($response);
 	},
     },
@@ -175,7 +175,7 @@ sub completion_function($$$) {
 	code => sub {
 	    my $max_lines = shift @_ || CALLLIST_LINES;
 	    print $OUT "getting call list...\n";
-	    my $response = $call_service->call(LIST_ACTION);
+	    my $response = $fritz->call(CALL_SERVICE, LIST_ACTION);
 	    if (check_ok($response)) {
 		my $xml = $ua->get($response->data->{LIST_ARG()});
 		my $xmltree = $xs->parse_string($xml->decoded_content);
@@ -279,17 +279,13 @@ print $OUT "OK\n";
 
 # get Fritz!Box connection
 print $OUT "establishing Fritz!Box connection...";
-my $fritz = Net::Fritz::Box->new(
+$fritz = Net::Fritz::Box->new(
     username => $user,
     password => $pass,
     defined $url ? (upnp_url => $url) : ()
     )
     ->discover;
 die unless check_ok($fritz);
-$call_service = $fritz->find_service(CALL_SERVICE);
-$voip_service = $fritz->find_service(VOIP_SERVICE);
-$call_service->errorcheck;
-$voip_service->errorcheck;
 
 # main loop
 print $OUT "\n";
