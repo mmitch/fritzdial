@@ -14,7 +14,7 @@ Given qr/a running fritzdial/, sub {
     isa_ok($expect, 'Expect', 'Expect->new');
 
     $expect->log_stdout(0);
-    # add search path to use Fritz::Box stub
+    # add search path to use Net::Fritz::Box stub
     # set $HOME do redirect to our configuration file
     $ENV{HOME} = getcwd().'/features/testarea';
     $expect->spawn('perl -I./features/stubbing ./fritzdial', ())
